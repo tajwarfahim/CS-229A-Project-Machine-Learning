@@ -14,17 +14,17 @@ def softmax_loss_and_gradient(dataset, W, reg):
     exp_matrix = np.exp(scores_matrix)
     ratio_matrix = exp_matrix / (np.sum(exp_matrix, axis = 1).reshape(-1, 1))
 
-    total_loss = -np.sum(np.log(ratio_matrix[np.arange(num_train), y]))
+    softmax_loss = -np.sum(np.log(ratio_matrix[np.arange(num_train), y]))
 
     ratio_matrix[np.arange(num_train), y] -= 1
-    dW = np.matmul(np.transpose(X), ratio_matrix)
-
-    # regularization
-    total_loss += 0.5 * reg * np.sum(np.square(W))
-    dW += reg * W
+    gradient = np.matmul(np.transpose(X), ratio_matrix)
 
     # averaging
-    total_loss /= num_train
-    dW /= num_train
+    softmax_loss /= num_train
+    gradient /= num_train
 
-    return total_loss, dW
+    # regularization
+    softmax_loss += 0.5 * reg * np.sum(np.square(W))
+    gradient += reg * W
+
+    return softmax_loss, gradient
