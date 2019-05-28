@@ -45,7 +45,7 @@ def read_input_features(filename, file_type):
 
     return numpy_X
 
-def read_labels(filename, file_type):
+def read_labels(filename, file_type, intended_class):
     dataFrame = get_panda_dataframe(filename, file_type)
 
     y = []
@@ -56,6 +56,10 @@ def read_labels(filename, file_type):
 
     numpy_y = np.transpose(np.array(y))
     numpy_y -= 1
+
+    if intended_class != None:
+        numpy_y[numpy_y != intended_class] = 0
+        numpy_y[numpy_y == intended_class] = 1
 
     assert(numpy_y.shape == (num_rows,))
 
@@ -146,11 +150,10 @@ def split_dataset(total_dataset, training_data_fraction, validation_data_fractio
 
     return training_dataset, validation_dataset, test_dataset
 
-
 class Dataset_Reader:
-    def __init__(self, filename, file_type, X = None, Y = None):
+    def __init__(self, filename, file_type, X = None, Y = None, intended_class = None):
         self.X = read_input_features(filename, file_type)
-        self.y = read_labels(filename, file_type)
+        self.y = read_labels(filename, file_type, intended_class)
 
     def get_X(self):
         return self.X
@@ -219,6 +222,45 @@ class Balanced_Class_Dataset_Divider:
     def __init__(self, dataset_reader, num_data = "all", training_data_fraction = 0.6, validation_data_fraction = 0.2, test_data_fraction = 0.2):
         dataset = Dataset(dataset_reader.get_X(), dataset_reader.get_y())
         class_distribution = dataset.get_class_distribution()
+        min_index, min_number_of_datapoints = find_min_of_map(class_distribution)
+        num_classes = np.max(dataset.get_y()) + 1
+
+        self.separated = separate_dataset(dataset.get_X(), dataset.get_y(), num_classes)
+        even_dataset = get_even_dataset(self.separated, min_number_of_datapoints)
+        X, y = randomize_dataset(even_dataset)
+
+        if num_data != "all":
+            rand_index = np.random.choice(X.shape[0], num_data, replace = False)
+            X = X[rand_index]
+            y = y[rand_index]
+        else:
+            num_data = X.shape[0]
+
+        self.total_dataset = Dataset(X, y)
+        self.training_dataset, self.validation_dataset, self.test_dataset = split_dataset(self.total_dataset, training_data_fraction, validation_data_fraction, test_data_fraction)
+
+    def get_training_dataset(self):
+        return self.training_dataset
+
+    def get_validation_dataset(self):
+        return self.validation_dataset
+
+    def get_test_dataset(self):
+        return self.test_dataset
+
+    def get_total_dataset(self):
+        return self.total_dataset
+
+    def get_separated_dataset(self):
+        return self.separated
+
+
+class Binary_Dataset_Reader:
+    def __init__(self, filename, file_type, given_intended_class = 2, num_data = "all", training_data_fraction = 0.6, validation_data_fraction = 0.2, test_data_fraction = 0.2):
+        dataset_reader = Dataset_Reader(filename, file_type, intended_class = given_intended_class)
+        dataset = Dataset(dataset_reader.get_X(), dataset_reader.get_y())
+        class_distribution = dataset.get_class_distribution()
+        print(class_distribution)
         min_index, min_number_of_datapoints = find_min_of_map(class_distribution)
         num_classes = np.max(dataset.get_y()) + 1
 

@@ -27,7 +27,7 @@ def get_class_accuracy(particular_class, X, y, W):
     return class_accuracy
 
 class Linear_Model:
-    def __init__(self, model_type, dataset, weight_scale = 0.001):
+    def __init__(self, model_type, dataset, weight_scale = 0.001, binary_classification = False):
         self.model_type = model_type
         self.dataset = dataset
         self.num_features = dataset.get_number_of_features()
@@ -40,6 +40,8 @@ class Linear_Model:
             self.loss_function = softmax_loss_and_gradient
         else:
             self.loss_function = svm_loss_and_gradient
+
+        self.binary_classification = binary_classification
 
     def train(self, learning_rate = 1e-3, reg = 1e-2,
             num_epochs = 100, batch_size = 200, verbose = False, num_print = 10,
@@ -68,6 +70,10 @@ class Linear_Model:
                 running_loss_history = []
                 training_accuracies.append(training_accuracy)
 
+        if self.binary_classification:
+            self.prepare_confusion_matrix(self.dataset.get_X(), self.dataset.get_y())
+            self.prepare_vital_statistics(self.confusion_matrix)
+
         return average_loss_history, training_accuracies, self.get_per_class_accuracy(self.dataset.get_X(), self.dataset.get_y())
 
     def predict(self, X_test):
@@ -90,3 +96,47 @@ class Linear_Model:
             class_accuracies[particular_class] = get_class_accuracy(particular_class, X_test, y_test, self.W)
 
         return class_accuracies
+
+    def prepare_confusion_matrix(self, X, y):
+        if self.binary_classification == False:
+            return None
+
+        y_pred = self.predict(X)
+        true_positive = 0
+        true_negative = 0
+        false_positive = 0
+        false_negative = 0
+
+        for i in range(X.shape[0]):
+            if y[i] == 1:
+                if y_pred[i] == 1:
+                    true_positive += 1
+                else:
+                    false_negative += 1
+
+            else:
+                if y_pred[i] == 0:
+                    true_negative += 1
+                else:
+                    false_positive += 1
+
+        self.confusion_matrix = true_positive, true_negative, false_positive, false_negative
+
+    def prepare_vital_statistics(self, confusion_matrix):
+        true_positive, true_negative, false_positive, false_negative = confusion_matrix
+        self.true_positive_rate = float(true_positive) / (true_positive + false_negative)
+        self.true_negative_rate = float(true_negative) / (true_negative + false_positive)
+        self.false_positive_rate = 1 - self.true_negative_rate
+        self.false_negative_rate = 1 - self.true_positive_rate
+
+        self.precision = float(true_positive) / (true_positive + false_positive)
+        self.recall = float(true_positive) / (true_positive + false_negative)
+
+    def print_vital_statistics_for_training_model(self):
+        print(self.true_positive_rate)
+        print(self.true_negative_rate)
+        print(self.false_positive_rate)
+        print(self.false_negative_rate)
+
+        print(self.precision)
+        print(self.recall)

@@ -18,7 +18,10 @@ def show_plot(array, x_title = None, y_title = None):
 
 def visualize_dataset(split_dataset, datapoints_per_class, index_1, index_2):
     groups = create_groups(split_dataset, datapoints_per_class, index_1, index_2)
-    colors = ['green', 'blue', 'red']
+    if len(split_dataset) == 3:
+        colors = ['green', 'blue', 'red']
+    else:
+        colors = ['green', 'red']
 
     fig = plt.figure(figsize=(8, 8))
 
