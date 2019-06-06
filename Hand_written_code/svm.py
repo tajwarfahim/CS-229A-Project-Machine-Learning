@@ -1,3 +1,5 @@
+# author: Fahim Tajwar
+
 import numpy as np
 import math
 from read_data_file import *

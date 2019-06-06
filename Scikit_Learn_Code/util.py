@@ -1,3 +1,5 @@
+# author: Fahim Tajwar
+
 import matplotlib as mp
 import matplotlib.pyplot as plt
 import numpy as np
@@ -28,7 +30,7 @@ def visualize_dataset(split_dataset, datapoints_per_class, index_1, index_2, x_t
     for i in range(len(groups)):
         x_1, x_2 = groups[i]
         color_for_this_group = colors[i]
-        
+
         if labels != None:
             plt.scatter(x_1, x_2, marker = '*', color = color_for_this_group, label = labels[i])
         else:
@@ -53,7 +55,14 @@ def create_groups(split_dataset, datapoints_per_class, index_1, index_2):
 
     return tuple(groups)
 
-def plot_bar_graph_from_map(map):
+def plot_accuracy_per_class(map):
     plt.bar(map.keys(), map.values(), color='g')
     plt.xlabel("Class")
     plt.ylabel("Accuracy for that class")
+
+def plot_bar_graph_from_map(map, x_label, y_label, label_for_each_class):
+    plt.bar(range(len(map)), list(map.values()), align='center')
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.xticks(range(len(map)), label_for_each_class)
+    plt.show()
