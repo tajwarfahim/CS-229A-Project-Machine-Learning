@@ -131,6 +131,7 @@ class Linear_Model:
 
         self.precision = float(true_positive) / (true_positive + false_positive)
         self.recall = float(true_positive) / (true_positive + false_negative)
+        self.F_score = 2.0 / (1.0 / self.precision + 1.0 / self.recall)
 
     def print_vital_statistics_for_training_model(self):
         print(self.true_positive_rate)
@@ -140,3 +141,4 @@ class Linear_Model:
 
         print(self.precision)
         print(self.recall)
+        print(self.F_score)
