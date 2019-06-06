@@ -256,8 +256,8 @@ class Balanced_Class_Dataset_Divider:
     def get_separated_dataset(self):
         return self.separated
 
-
-class Binary_Dataset_Reader:
+# reads binary data, and arbitrarily samples to make all the classes have same number of examples in them
+class Binary_Even_Dataset_Reader:
     def __init__(self, filename, file_type, given_intended_class = 2, num_data = "all", training_data_fraction = 0.6, validation_data_fraction = 0.2, test_data_fraction = 0.2):
         dataset_reader = Dataset_Reader(filename, file_type, intended_class = given_intended_class)
         dataset = Dataset(dataset_reader.get_X(), dataset_reader.get_y())
@@ -294,3 +294,31 @@ class Binary_Dataset_Reader:
 
     def get_separated_dataset(self):
         return self.separated
+
+# does not change class frequency
+class Binary_Dataset_Reader:
+    def __init__(self, filename, file_type, given_intended_class = 2, num_data = "all",
+                training_data_fraction = 0.6, validation_data_fraction = 0.2, test_data_fraction = 0.2):
+
+        dataset_reader = Dataset_Reader(filename, file_type, intended_class = given_intended_class)
+        self.total_dataset= Dataset(dataset_reader.get_X(), dataset_reader.get_y())
+        self.class_distribution = self.total_dataset.get_class_distribution()
+        self.training_dataset, self.validation_dataset, self.test_dataset = split_dataset(self.total_dataset, training_data_fraction, validation_data_fraction, test_data_fraction)
+
+    def get_training_dataset(self):
+        return self.training_dataset
+
+    def get_validation_dataset(self):
+        return self.validation_dataset
+
+    def get_test_dataset(self):
+        return self.test_dataset
+
+    def get_total_dataset(self):
+        return self.total_dataset
+
+    def get_separated_dataset(self):
+        return self.separated
+
+    def get_class_distribution(self):
+        return self.class_distribution

@@ -1,10 +1,12 @@
 # author: Fahim Tajwar
+# different functions, useful for other implementations
 
 import matplotlib as mp
 import matplotlib.pyplot as plt
 import numpy as np
 import math
 from read_data_file import *
+import sklearn.metrics as metrics
 
 def show_plot(array, x_title = None, y_title = None):
     x_axis = range(len(array))
@@ -66,3 +68,58 @@ def plot_bar_graph_from_map(map, x_label, y_label, label_for_each_class):
     plt.ylabel(y_label)
     plt.xticks(range(len(map)), label_for_each_class)
     plt.show()
+
+
+def draw_roc_curve(probability_vector, y, given_figsize = (8, 8), given_filename = None):
+    fpr, tpr, threshold = metrics.roc_curve(y, probability_vector)
+    roc_auc = metrics.auc(fpr, tpr)
+
+    fig = plt.figure(figsize = given_figsize)
+    ax = fig.add_subplot(111)
+    plt.title('Receiver Operating Characteristic')
+    ax.plot(fpr, tpr, 'b', label = 'AUC = %0.2f' % roc_auc)
+    ax.legend(loc = 'lower right')
+    ax.plot([0, 1], [0, 1],'r--')
+    plt.ylabel('True Positive Rate')
+    plt.xlabel('False Positive Rate')
+
+    if given_filename != None:
+        plt.savefig(given_filename)
+    else:
+        plt.show()
+
+def show_vital_statistics(predictions, target):
+    true_positive = 0
+    true_negative = 0
+    false_positive = 0
+    false_negative = 0
+
+    for i in range(predictions.shape[0]):
+        if target[i] == 0:
+            if predictions[i] == 0:
+                true_negative += 1
+            else:
+                false_positive += 1
+
+        else:
+            if predictions[i] == 1:
+                true_positive += 1
+            else:
+                false_negative += 1
+
+    print("True Positive Rate: ", float(true_positive) / (true_positive + false_negative))
+    print("True Negative Rate: ", float(true_negative) / (true_negative + false_positive))
+    print("False Positive Rate: ", 1.0 - float(true_negative) / (true_negative + false_positive))
+    print("False Negative Rate: ", 1.0 - float(true_positive) / (true_positive + false_negative))
+
+    precision = float(true_positive) / (true_positive + false_positive)
+    print("Precision : ", precision)
+
+    recall = float(true_positive)/ (true_positive + false_negative)
+    print("Recall : ", float(true_positive)/ (true_positive + false_negative))
+
+    F1_score = 2.0 / (1.0 / precision + 1.0 / recall)
+    print("F1 Score : ", F1_score)
+
+    accuracy = float(true_positive + true_negative) / (true_positive + true_negative + false_positive + false_negative)
+    print("Accuracy : ", accuracy)
