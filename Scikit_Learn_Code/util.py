@@ -1,5 +1,6 @@
 # author: Fahim Tajwar
 # different functions, useful for other implementations
+# cleanup was not done
 
 import matplotlib as mp
 import matplotlib.pyplot as plt
@@ -7,6 +8,7 @@ import numpy as np
 import math
 from read_data_file import *
 import sklearn.metrics as metrics
+import collections
 
 def show_plot(array, x_title = None, y_title = None):
     x_axis = range(len(array))
@@ -123,3 +125,45 @@ def show_vital_statistics(predictions, target):
 
     accuracy = float(true_positive + true_negative) / (true_positive + true_negative + false_positive + false_negative)
     print("Accuracy : ", accuracy)
+
+def get_F1_score(predictions, target):
+    true_positive = 0
+    true_negative = 0
+    false_positive = 0
+    false_negative = 0
+
+    for i in range(predictions.shape[0]):
+        if target[i] == 0:
+            if predictions[i] == 0:
+                true_negative += 1
+            else:
+                false_positive += 1
+
+        else:
+            if predictions[i] == 1:
+                true_positive += 1
+            else:
+                false_negative += 1
+
+
+    precision = float(true_positive) / (true_positive + false_positive)
+    recall = float(true_positive)/ (true_positive + false_negative)
+    F1_score = 2.0 / (1.0 / precision + 1.0 / recall)
+
+    return F1_score
+
+
+def get_per_class_accuracy(predictions, target):
+    total_map = collections.defaultdict(int)
+    correct_map = collections.defaultdict(int)
+
+    for i in range(predictions.shape[0]):
+        total_map[target[i]] += 1
+        if predictions[i] == target[i]:
+            correct_map[target[i]] += 1
+
+    accuracy_map = {}
+    for i in total_map:
+        accuracy_map[i] = float(correct_map[i]) / total_map[i]
+
+    return accuracy_map

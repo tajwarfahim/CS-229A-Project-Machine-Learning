@@ -206,7 +206,7 @@ class Dataset_Divider:
             y = y[rand_index]
 
         self.total_dataset = Dataset(X, y)
-        self.training_dataset, self.validation_dataset, self.testing_dataset = split_dataset(self.total_dataset, training_data_fraction, validation_data_fraction, test_data_fraction)
+        self.training_dataset, self.validation_dataset, self.test_dataset = split_dataset(self.total_dataset, training_data_fraction, validation_data_fraction, test_data_fraction)
 
     def get_training_dataset(self):
         return self.training_dataset
