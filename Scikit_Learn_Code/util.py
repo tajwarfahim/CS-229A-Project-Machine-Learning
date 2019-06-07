@@ -189,3 +189,28 @@ def get_random_sample(X, y, sample_size):
 
     sample_indices = np.random.choice(N, sample_size, replace = False)
     return X[sample_indices], y[sample_indices]
+
+
+def find_duplicates(X, y):
+    X, y = np.array(X), np.array(y)
+    class_map = collections.defaultdict(set)
+
+    for i in range(X.shape[0]):
+        X_i = tuple(list(X[i]))
+        class_map[X_i].add(y[i])
+
+    ambiguous = {}
+    for i in class_map:
+        if len(class_map[i]) > 1:
+            ambiguous[i] = len(class_map[i])
+
+    return ambiguous
+
+def look_for_impossible_classification(X, y):
+    ambiguous = find_duplicates(X, y)
+    if len(ambiguous) > 0:
+        print("Perfect classification based on this set of features is impossible")
+        print("Total ambiguous data points : ", len(ambiguous))
+        print(ambiguous)
+    else:
+        print("Building a better classifier should be possible")
