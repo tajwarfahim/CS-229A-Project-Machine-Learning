@@ -8,6 +8,7 @@ import sklearn as sklearn
 from sklearn.linear_model import LogisticRegression
 import seaborn as sns
 
+# abstract class to train and test our model
 class LogRegModel:
     def __init__(self, C_value = 1, given_class_weight = 'balanced', given_fit_intercept = True,
                 multi_class_decision = 'multinomial', given_solver = 'newton-cg'):
@@ -51,6 +52,7 @@ class LogRegModel:
         return get_per_class_accuracy(self.predict(X_test), y_test)
 
 
+# related separate functions
 def validation_logistic(C_values, X_train, y_train, X_val, y_val, X_test, y_test, class_weight = 'balanced', fit_intercept = True,
                 multi_class = 'multinomial', solver = 'newton-cg'):
 
@@ -79,3 +81,37 @@ def validation_logistic(C_values, X_train, y_train, X_val, y_val, X_test, y_test
     best_model.show_confusion_matrix(X_test, y_test)
     best_model.show_roc_curve(X_test, y_test)
     best_model.get_model_statistics(X_test, y_test)
+
+
+# experiment with bias variance issue
+def analyze_bias_variance_issue_logistic(X_train, y_train, X_test, y_test):
+    train_errors = []
+    test_errors = []
+    sample_sizes = []
+    num_trial = 10
+
+    N = X_train.shape[0]
+
+    for sample_size in range(1000, N, 100):
+        sample_sizes.append(sample_size)
+        train_error_sum = 0.0
+        test_error_sum = 0.0
+
+        for trial in range(num_trial):
+            X_train_sample, y_train_sample = get_random_sample(X_train, y_train, sample_size)
+            model = LogRegModel()
+            model.train(X_train_sample, y_train_sample)
+
+            train_error = 1.0 - model.get_accuracy(X_train_sample, y_train_sample)
+            test_error = 1.0 - model.get_accuracy(X_test, y_test)
+
+            train_error_sum += train_error
+            test_error_sum += test_error
+
+        average_train_error = float(train_error_sum) / num_trial
+        average_test_error = float(test_error_sum) / num_trial
+
+        train_errors.append(average_train_error)
+        test_errors.append(average_test_error)
+
+    show_train_and_test_error(np.array(train_errors), np.array(test_errors), np.array(sample_sizes))

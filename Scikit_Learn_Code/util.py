@@ -1,5 +1,5 @@
 # author: Fahim Tajwar
-# different functions, useful for other implementations
+# various functions, useful for other implementations
 # cleanup was not done
 
 import matplotlib as mp
@@ -21,6 +21,21 @@ def show_plot(array, x_title = None, y_title = None):
         plt.ylabel(y_title)
 
     plt.show()
+
+# help taken from : https://matplotlib.org/3.1.0/api/_as_gen/matplotlib.pyplot.legend.html
+def show_train_and_test_error(train_errors, test_errors, sample_sizes):
+    fig, ax = plt.subplots()
+    ax.plot(sample_sizes, train_errors, 'k--', label='Train error')
+    ax.plot(sample_sizes, test_errors, 'k:', label='Test Error')
+
+    legend = ax.legend(loc='lower left', shadow=True, fontsize='small')
+
+    # Put a nicer background color on the legend.
+
+    plt.xlabel("Training Dataset Size")
+    plt.ylabel("Error")
+    plt.show()
+
 
 def visualize_dataset(split_dataset, datapoints_per_class, index_1, index_2, x_title = None, y_title = None, labels = None):
     groups = create_groups(split_dataset, datapoints_per_class, index_1, index_2)
@@ -70,7 +85,6 @@ def plot_bar_graph_from_map(map, x_label, y_label, label_for_each_class):
     plt.ylabel(y_label)
     plt.xticks(range(len(map)), label_for_each_class)
     plt.show()
-
 
 def draw_roc_curve(probability_vector, y, given_figsize = (8, 8), given_filename = None):
     fpr, tpr, threshold = metrics.roc_curve(y, probability_vector)
@@ -167,3 +181,11 @@ def get_per_class_accuracy(predictions, target):
         accuracy_map[i] = float(correct_map[i]) / total_map[i]
 
     return accuracy_map
+
+def get_random_sample(X, y, sample_size):
+    X = np.array(X)
+    y = np.array(y)
+    N = X.shape[0]
+
+    sample_indices = np.random.choice(N, sample_size, replace = False)
+    return X[sample_indices], y[sample_indices]

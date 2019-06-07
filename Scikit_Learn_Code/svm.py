@@ -101,6 +101,7 @@ class SVMGaussian:
         plt.xlabel('Predicted label')
         all_sample_title = 'Accuracy Score: {0}'.format(self.get_accuracy(X_test, y_test))
         plt.title(all_sample_title, size = 15)
+        plt.show()
 
     def get_decision_function(self, X_test):
         return self.model.decision_function(X_test)
@@ -146,3 +147,69 @@ def validation_Gaussian_SVM(C_values, X_train, y_train, X_val, y_val, X_test, y_
     if multi_class == False:
         best_model.show_roc_curve(X_test, y_test)
         best_model.get_model_statistics(X_test, y_test)
+
+
+def analyze_bias_variance_issue_linear_SVM(X_train, y_train, X_test, y_test):
+    train_errors = []
+    test_errors = []
+    sample_sizes = []
+    num_trial = 5
+
+    N = X_train.shape[0]
+
+    for sample_size in range(1000, N, 100):
+        sample_sizes.append(sample_size)
+        train_error_sum = 0.0
+        test_error_sum = 0.0
+
+        for trial in range(num_trial):
+            X_train_sample, y_train_sample = get_random_sample(X_train, y_train, sample_size)
+            model = LinearSVMModel()
+            model.train(X_train_sample, y_train_sample)
+
+            train_error = 1.0 - model.get_accuracy(X_train_sample, y_train_sample)
+            test_error = 1.0 - model.get_accuracy(X_test, y_test)
+
+            train_error_sum += train_error
+            test_error_sum += test_error
+
+        average_train_error = float(train_error_sum) / num_trial
+        average_test_error = float(test_error_sum) / num_trial
+
+        train_errors.append(average_train_error)
+        test_errors.append(average_test_error)
+
+    show_train_and_test_error(train_errors, test_errors, sample_sizes)
+
+
+def analyze_bias_variance_issue_gaussian_svm(X_train, y_train, X_test, y_test):
+    train_errors = []
+    test_errors = []
+    sample_sizes = []
+    num_trial = 5
+
+    N = X_train.shape[0]
+
+    for sample_size in range(1000, N, 100):
+        sample_sizes.append(sample_size)
+        train_error_sum = 0.0
+        test_error_sum = 0.0
+
+        for trial in range(num_trial):
+            X_train_sample, y_train_sample = get_random_sample(X_train, y_train, sample_size)
+            model = SVMGaussian()
+            model.train(X_train_sample, y_train_sample)
+
+            train_error = 1.0 - model.get_accuracy(X_train_sample, y_train_sample)
+            test_error = 1.0 - model.get_accuracy(X_test, y_test)
+
+            train_error_sum += train_error
+            test_error_sum += test_error
+
+        average_train_error = float(train_error_sum) / num_trial
+        average_test_error = float(test_error_sum) / num_trial
+
+        train_errors.append(average_train_error)
+        test_errors.append(average_test_error)
+
+    show_train_and_test_error(train_errors, test_errors, sample_sizes)
