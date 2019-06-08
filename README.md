@@ -1,4 +1,4 @@
-Machine Learning CS 229A
+Machine Learning Project - CS 229A, Stanford University
 
 Author: Fahim Tajwar, Zach Harned
 
