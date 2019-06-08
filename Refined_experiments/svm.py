@@ -13,7 +13,7 @@ class LinearSVMModel:
                 multi_class_decision = 'ovr'):
 
         self.model = LinearSVC(class_weight = given_class_weight, fit_intercept = given_fit_intercept,
-                                        multi_class = multi_class_decision, C = C_value, max_iter = 10000)
+                                        multi_class = multi_class_decision, C = C_value, max_iter = 100000)
 
     def train(self, X_train, y_train):
         self.model.fit(X_train, y_train)
