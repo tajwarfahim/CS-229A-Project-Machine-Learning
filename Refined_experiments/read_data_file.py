@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import math as math
 from builtins import *
+import torch as torch
 
 # helper functions
 def create_input_vector(dataFrame, row_index, num_cols):
@@ -152,6 +153,20 @@ def split_dataset(total_dataset, training_data_fraction, validation_data_fractio
 
     return training_dataset, validation_dataset, test_dataset
 
+def get_class_weights(class_distribution):
+    num_classes = len(class_distribution)
+    class_weights = list(range(num_classes))
+
+    max_freq = float('-inf')
+    for i in class_distribution:
+        if class_distribution[i] > max_freq:
+            max_freq = class_distribution[i]
+
+    for i in class_distribution:
+        class_weights[i] = float(max_freq) / class_distribution[i]
+
+    return np.array(class_weights)
+
 class Dataset_Reader:
     def __init__(self, filename, file_type, X = None, Y = None, intended_class = None):
         self.X = read_input_features(filename, file_type)
@@ -168,6 +183,7 @@ class Dataset:
         self.X = X_data
         self.y = y_data
         self.class_distribution = find_class_distribution(self.y)
+        self.class_weight = torch.tensor(get_class_weights(self.class_distribution))
 
     def get_X(self):
         return self.X
@@ -192,6 +208,12 @@ class Dataset:
 
     def get_class_distribution(self):
         return self.class_distribution
+
+    def get_pytorch_data(self):
+        return torch.tensor(self.X), torch.tensor(self.y)
+
+    def get_class_weight(self):
+        return self.class_weight
 
 class Dataset_Divider:
     def __init__(self, dataset_reader, total_data_points = "all", training_data_fraction = 0.6, validation_data_fraction = 0.2, test_data_fraction = 0.2):
