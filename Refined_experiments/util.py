@@ -90,7 +90,7 @@ def plot_accuracy_per_class(map):
     plt.ylabel("Accuracy for that class")
 
 def plot_bar_graph_from_map(map, x_label, y_label, label_for_each_class):
-    plt.bar(range(len(map)), list(map.values()), align='center')
+    plt.bar(range(len(map)), [map[key] for key in sorted(list(map.keys()))], align='center')
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     plt.xticks(range(len(map)), label_for_each_class)
